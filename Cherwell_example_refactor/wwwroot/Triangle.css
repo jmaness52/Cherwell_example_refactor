@@ -1,0 +1,61 @@
+﻿html {
+    height: 1000px;
+    width: 1000px;
+}
+
+form {
+    margin-left: 375px;
+    width: 400px;
+    
+}
+
+input, textarea {
+    
+    font: 1em sans-serif;
+    
+    width: 32px;
+    height: 25px;
+    box-sizing: border-box;
+   
+    border: 1px solid #999;
+    
+}
+
+canvas {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+button {
+    margin: 40px 0px 0px 130px;
+    width: 100px;
+}
+#textArea {
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+}
+.coor1 {
+    flex-basis: 33%;
+    
+}
+
+.coor2 {
+    flex-basis: 33%;
+    
+}
+
+.coor3 {
+    flex-basis: 33%;
+    
+}
+
+#result {
+    margin-top: 50px;
+    margin-left: 75px;
+    font: 1.5em arial;
+}
+
+#searchResult {
+    color: red;
+}

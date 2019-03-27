@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="Triangle.css">
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    
+    <title>Triangle Problem</title>
+</head>
+<body onload="loadList();">
+    <p>Jeff Maness</p>
+    <p>Coding Question - Right Triangles</p>
+    <canvas id="canvas1" height="560" width="800"></canvas>
+
+    <form>
+        <div id="textArea">
+            <div class="coor1">
+                <div class="x">
+                    <label for="x1">X1:</label>
+                    <input type="text" id="x1" name="x1_coor" maxlength="3">
+                </div>
+                <div class="y">
+                    <label for="y1">Y1:</label>
+                    <input type="text" id="y1" name="y1_coor" maxlength="3">
+                </div>
+            </div>
+            <div class="coor2">
+                <div class="x">
+                    <label for="x2">X2:</label>
+                    <input type="text" id="x2" name="x2_coor" maxlength="3">
+                </div>
+                <div class="y">
+                    <label for="y2">Y2:</label>
+                    <input type="text" id="y2" name="y2_coor" maxlength="3">
+                </div>
+            </div>
+            <div class="coor3">
+                <div class="x">
+                    <label for="x3">X3:</label>
+                    <input type="text" id="x3" name="x3_coor" maxlength="3">
+                </div>
+                <div class="y">
+                    <label for="y3">Y3:</label>
+                    <input type="text" id="y3" name="y3_coor" maxlength="3">
+                </div>
+            </div>
+        </div>
+        <div id="result">
+            <p>Result: <span id="searchResult"></span> </p>
+        </div>
+        <button id="search" type="button" onclick="searchCoordinates()">Search</button>
+        <button id="clear" type="button" onclick="clearForm()">Clear</button>
+    </form>
+
+    <script type="text/javascript">
+
+        var triangleList = [];
+        var currentX = 0;
+        var currentY = 0;
+
+
+        function loadList() {
+            /* grabs list of all triangles with coordinates from API and loads
+             into a javascript array. Triangle list generated initially in API*/
+            $.getJSON('api/Triangle').done(function (data) {
+                $.each(data, function (key, item) {
+
+                    var t = new Object();
+                    t.name = item.name;
+                    t.row = item.row
+                    t.column = item.col
+                    t.x1 = item.x1;
+                    t.x2 = item.x2;
+                    t.x3 = item.x3;
+                    t.y1 = item.y1;
+                    t.y2 = item.y2;
+                    t.y3 = item.y3;
+
+                    triangleList.push(t);
+                });
+            }).done(function () {
+                updateCanvas();
+            });
+        }
+
+
+
+        function searchCoordinates() {
+            /* Searches for row/column of triangle based on input coordinates
+             concentanates a URL to enter from the textbox values*/
+
+            var uri = 'api/Triangle/Search?'
+            uri = uri.concat('X1=', document.getElementById('x1').value);
+            uri = uri.concat('&X2=', document.getElementById('x2').value);
+            uri = uri.concat('&X3=', document.getElementById('x3').value);
+            uri = uri.concat('&Y1=', document.getElementById('y1').value);
+            uri = uri.concat('&Y2=', document.getElementById('y2').value);
+            uri = uri.concat('&Y3=', document.getElementById('y3').value);
+
+
+
+
+            /* The canvas is updated and a triangle row column will be highlighted
+             red if found. Also the search result will be displayed in a span above
+             the search button*/
+
+            $.ajax({
+                type: "GET",
+                url: uri,
+                success: function (result) {
+                    updateCanvas(result);
+
+                    if (result && result != "") {
+                        document.getElementById('searchResult').textContent = result;
+                    }
+                    else {
+                        document.getElementById('searchResult').textContent = "Not Found!";
+                    }
+                }
+            });
+        }
+               
+
+                
+            
+        
+
+        function clearForm() {
+
+            /* clears the textboxes, redraws the canvas, and removes
+             any text from the span*/
+            updateCanvas();
+            document.getElementById('x1').value = "";
+            document.getElementById('x2').value = "";
+            document.getElementById('x3').value = "";
+            document.getElementById('y1').value = "";
+            document.getElementById('y2').value = "";
+            document.getElementById('y3').value = "";
+            document.getElementById('searchResult').textContent = "";
+        }
+
+        function updateCanvas(nameHighlight) {
+
+            const canvas = document.getElementById('canvas1');
+
+
+            if (canvas.getContext) {
+
+                const ctx = canvas.getContext('2d');
+                /* clear canvas for redraw */
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = 'black';
+                ctx.font = "15px Arial"
+                ctx.moveTo(50, 50);
+
+
+                /* draws static info on canvas*/
+                ctx.beginPath();
+                ctx.moveTo(50, 100);
+                ctx.lineTo(100, 100);
+                ctx.lineTo(50, 50);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.fillText("v1", 35, 115);
+                ctx.fillText("v2", 35, 38);
+                ctx.fillText("v3", 115, 112);
+                ctx.fillText("From Problem Statement", 20, 135);
+
+                ctx.beginPath();
+                ctx.moveTo(100, 200);
+                ctx.lineTo(50, 200);
+                ctx.lineTo(100, 250);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.fillText("v1", 112, 200);
+                ctx.fillText("v2", 25, 200);
+                ctx.fillText("v3", 112, 250);
+                ctx.fillText("Assumption: Even Triangles", 20, 280);
+                ctx.fillText("A2,A4,B4, ect are mirrored", 20, 300);
+                ctx.fillText("from the odd triangles. As ", 20, 320);
+                ctx.fillText("opposed to rotated.", 20, 340);
+                ctx.fillText("0,0", 280, 35);
+                ctx.fillText("60,0", 770, 35);
+                ctx.fillText("60,60", 760, 555);
+                ctx.fillText("0,60", 280, 555);
+
+                /* The triangles are drawn from the list that is loaded
+                 from the API. The scale factor is used to enlarge the triangles
+                 visually while keeping the initial coordinates intact. x0,y0 are
+                 initial position of the graph*/
+                const scale = 8;
+                const x0 = 300;
+                const y0 = 50;
+
+                triangleList.forEach((item, index) => {
+                    ctx.beginPath();
+
+                    ctx.moveTo((x0 + item.x1 * scale), (y0 + item.y1 * scale));
+                    ctx.lineTo((x0 + item.x2 * scale), (y0 + item.y2 * scale));
+                    ctx.lineTo((x0 + item.x3 * scale), (y0 + item.y3 * scale));
+                    ctx.closePath();
+                    ctx.stroke();
+                    //even pieces
+                    if (item.x1 > item.x2) {
+
+                        /* If a search is successful, it will draw the found
+                          piece as red*/
+                        if (nameHighlight) {
+
+                            if (item.name == nameHighlight) {
+                                ctx.strokeStyle = 'red';
+                                ctx.fillStyle = 'red'
+                                ctx.fillText(item.name, (x0 + (item.x2 + 6) * scale), (y0 + (item.y2 + 5) * scale));
+                                ctx.strokeStyle = 'black';
+                                ctx.fillStyle = 'black';
+                            }
+                            else {
+                                ctx.fillText(item.name, (x0 + (item.x2 + 6) * scale), (y0 + (item.y2 + 5) * scale));
+                            }
+
+                        }
+                        else {
+                            ctx.fillText(item.name, (x0 + (item.x2 + 6) * scale), (y0 + (item.y2 + 5) * scale));
+                        }
+
+                    }
+                    else {
+                        // odd pieces
+                        if (nameHighlight) {
+
+                            if (item.name == nameHighlight) {
+                                ctx.strokeStyle = 'red';
+                                ctx.fillStyle = 'red'
+                                ctx.fillText(item.name, (x0 + (item.x1 + 2) * scale), (y0 + (item.y1 - 2) * scale));
+                                ctx.strokeStyle = 'black';
+                                ctx.fillStyle = 'black';
+                            }
+                            else {
+                                ctx.fillText(item.name, (x0 + (item.x1 + 2) * scale), (y0 + (item.y1 - 2) * scale));
+                            }
+
+                        }
+                        else {
+                            ctx.fillText(item.name, (x0 + (item.x1 + 2) * scale), (y0 + (item.y1 - 2) * scale));
+                        }
+
+
+                    }
+                });
+
+            }
+        }
+
+    </script>
+
+</body>
+</html>
